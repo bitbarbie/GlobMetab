@@ -1,0 +1,17 @@
+Package: GlobMetab
+Type: Package
+Title: A package for global identification of metabolites.
+Version: 1.0
+Date: 2015-02-11
+Author: Sarah Scharfenberg
+Maintainer: Sarah Scharfenberg <sscharfe@ipb-halle.de>
+Description: The package is supposed to help identifying 
+  metabolites of a biological sample taking into account 
+    that compounds of the same sample are in some way related to eachother.
+License: GPL-3
+Imports:
+  KEGGREST,
+  data.table,
+  metfRag,
+  rcdk,
+  rpubchem(>= v1.5.0.4 )
