@@ -78,7 +78,7 @@ similarity <- function(fp1, fp2, dist="tanimoto") {
 
   sim <- NULL
   if(!is.null(fp1) && !is.null(fp2)){
-    sim <- rcdk::distance(fp1, fp2, method = dist)
+    sim <- fingerprint::distance(fp1, fp2, method = dist)
   }
   return(sim)
 }
