@@ -4,22 +4,22 @@
 \alias{similarity}
 \title{Calculate similarity of 2 smiles.}
 \usage{
-similarity(s1, s2, dist = "tanimoto")
+similarity(fp1, fp2, dist = "tanimoto")
 }
 \arguments{
-\item{s1}{smiles string of compound 1}
+\item{fp1}{fingerprint of compound 1}
 
-\item{s2}{smiles string of compound 2}
+\item{fp2}{fingerprint of compound 2}
 
 \item{dist}{the distance to calculate as parameter method defined
 in rcdk::distance}
 }
 \value{
-The distance of the two smiles.
+The distance of the two fringerprints.
 }
 \description{
 This function calculates the chosen distance between two
-smiles strings.
+rcdk smiles.
 }
 \author{
 Sarah Scharfenberg

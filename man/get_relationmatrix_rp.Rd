@@ -13,7 +13,7 @@ get_relationmatrix_rp(p, rp)
 respectively.}
 }
 \value{
-A matrix CxC containing 1 if there is a reaction pair containing
+A sparse matrix CxC containing 1 if there is a reaction pair containing
 these compounds, 0 else. Connections are not directed and do not exist
 for a compound with itself.
 }

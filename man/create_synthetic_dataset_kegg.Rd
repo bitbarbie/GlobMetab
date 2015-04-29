@@ -15,6 +15,9 @@ either \"mass\" or \"id\".}
 
 \item{mode}{a character string defining the values of the matrix. It can
 be \"likelihood\" or \"value\". (see Details)}
+
+\item{value}{a numeric value that should is set for each candidate
+if mode was "value".}
 }
 \value{
 A CxM matrix containing a value for each candidate of each mass

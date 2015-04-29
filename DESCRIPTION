@@ -9,10 +9,17 @@ Description: The package is supposed to help identifying
   metabolites of a biological sample taking into account 
     that compounds of the same sample are in some way related to eachother.
 License: GPL-3
+Depends:
+    R (>= 3.1.1)
 Imports:
-  R (>= 3.0.1),
   KEGGREST,
   data.table,
   metfRag (>= 1.0.4),
   rcdk (>= 3.2.8.3),
-  rpubchem (>= 1.5.0.2)
+  rpubchem (>= 1.5.0.2),
+  Matrix,
+  foreach,
+  parallel,
+  doParallel,
+  iterators
+  

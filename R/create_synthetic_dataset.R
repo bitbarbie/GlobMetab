@@ -6,6 +6,8 @@
 #' either \"mass\" or \"id\".
 #' @param mode a character string defining the values of the matrix. It can
 #' be \"likelihood\" or \"value\". (see Details)
+#' @param value a numeric value that should is set for each candidate
+#' if mode was "value".
 #' @author Sarah Scharfenberg
 #' @details For each mass / id a compound search using keggFind is done and
 #' each match is stored with a value. If likelihood was chosen a probability
@@ -117,23 +119,6 @@ create_synthetic_dataset_kegg<-function(x, input=c("mass","id"),
   return(p)
 }
 
-#'@title Eliminate redundancies.
-#'@description This function matchs redundand rows into one row.
-#'@param p a matrix
-#'@return the reduced matrix.
-#'@export  
-eliminate_redundancies <- function(p){
-  rows <- rownames(p)
-  uniques <- unique(rows)
-  res <- matrix(0.0, nrow = length(uniques),ncol=ncol(p))
-  rownames(res)<-uniques
-  colnames(res)<-colnames(p)
-  for(row in 1:nrow(p)){
-    index <- which(p[row,]>0)
-    res[rows[row],index]<-p[row,index]
-  }
-  return(res)
-}
 
 
 #' @title Create a synthetic dataset based on PubChem IDs.
@@ -145,6 +130,8 @@ eliminate_redundancies <- function(p){
 #' either \"mass\" or \"id\".
 #' @param mode a character string defining the values of the matrix. It can
 #' be \"likelihood\" or \"value\" or \"mass\". (see Details)
+#' @param value a numeric value that should is set for each candidate
+#' if mode was "value".
 #' @author Sarah Scharfenberg
 #' @details For each mass / id a compound search using keggFind is done and
 #' each match is stored with a value. If likelihood was chosen a probability
