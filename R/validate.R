@@ -280,12 +280,13 @@ validate_rank<-function(z_true,p,p_new){
 #' @param last a logical value indicating whether the samples should be 
 #' obtained from the end (e.g. the last 1000 samples, equivalent to a
 #' burn in phase of nrow(class_table)-samples)
+#' @param comp_cores number of cores to use for parallel processing
 #' @author Sarah Scharfenberg
 #' @return A matrix storing the new scores.
 #' @export
 calculate_score <- function(p,class_table,samples,
                             burnin_samples=NULL,mode=NULL,
-                            last=FALSE){
+                            last=FALSE, comp_cores){
   
   if(ncol(p)!=nrow(class_table)){
     stop(print("wrong dimension"))
@@ -302,15 +303,37 @@ calculate_score <- function(p,class_table,samples,
     }
   }
   
-  result <- matrix(0, ncol=ncol(p), nrow=nrow(p))
-  for(m in 1:ncol(p)){
-    counts <- as.data.frame(table(class_table[m,start:end]))
-    for(i in 1:nrow(counts)){
-      # entry in counts corresponds to the position in p
-      # as the rows are the same we can directly take this
-      result[as.integer(as.character(counts[i,"Var1"])),m]<-as.integer(counts[i,"Freq"])
-    }
+ # result <- matrix(0, ncol=ncol(p), nrow=nrow(p))
+  
+  if(comp_cores > detectCores()){comp_cores <- detectCores()}
+  cl <- makeCluster(comp_cores)
+  registerDoParallel(cl)
+#########################################################
+  result<- foreach::foreach( m=1:ncol(p), 
+                              .errorhandling = "stop",
+                              .init=NULL,
+                              .combine = "cbind") %dopar%{ 
+######################################################### 
+#  for(m in 1:ncol(p)){
+
+#     counts <- as.data.frame(table(class_table[m,start:end]))
+#     for(i in 1:nrow(counts)){
+#       # entry in counts corresponds to the position in p
+#       # as the rows are the same we can directly take this
+#       res[as.integer(as.character(counts[i,"Var1"]))] <-as.integer(counts[i,"Freq"])
+#     }
+    tmp_ct <- as.integer(class_table[m,start:end])
+    ct_uniq <- unique(tmp_ct)
+    count_uniq <- sapply(1:length(ct_uniq),function(i){
+      return(sum(tmp_ct == ct_uniq[i]))
+    })
+    res <- vector("numeric",nrow(p))
+    res[ct_uniq]<-count_uniq
+    # res is a column vector containing the occurence of ...
+    # in range of class_table[m,start:end]
+    return(res)
   }
+  stopCluster(cl)
   rownames(result)<-rownames(p)
   colnames(result)<-colnames(p)
   result <- result/ncol(class_table)
