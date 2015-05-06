@@ -283,6 +283,8 @@ validate_rank<-function(z_true,p,p_new){
 #' @param comp_cores number of cores to use for parallel processing
 #' @author Sarah Scharfenberg
 #' @return A matrix storing the new scores.
+#' @import doParallel
+#' @import parallel
 #' @export
 calculate_score <- function(p,class_table,samples,
                             burnin_samples=NULL,mode=NULL,
