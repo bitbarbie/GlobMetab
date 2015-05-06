@@ -237,26 +237,32 @@ validate_rank<-function(z_true,p,p_new){
     print("p and p_new are not same size")
     return(NULL)
   }
+  take <- z_true[z_true!=0]
+  report <- diag(p[take,names(take)])-diag(p_new[take,names(take)])
   
   res <- vector("numeric",4)
-  for(m in 1:ncol(p)){
-    if(z_true[m]==0){
-      res[4]<-res[4]+1
-    }
-    else{
-      if(p[z_true[m],m]!=p_new[z_true[m],m]){
-        if(p[z_true[m],m]>p_new[z_true[m],m]){
-          res[1]<-res[1]+1
-        }
-        else{
-          res[2]<-res[2]+1
-        }
-      }
-      else{
-        res[3]<-res[3]+1
-      }
-    }
-  }
+  res[1] <- sum(report > 0)
+  res[2] <- sum(report < 0)
+  res[3] <- sum(report==0)
+  res[4] <- length(z_true) - length(take)
+#   for(m in 1:ncol(p)){
+#     if(z_true[m]==0){
+#       res[4]<-res[4]+1
+#     }
+#     else{
+#       if(p[z_true[m],m]!=p_new[z_true[m],m]){
+#         if(p[z_true[m],m]>p_new[z_true[m],m]){
+#           res[1]<-res[1]+1
+#         }
+#         else{
+#           res[2]<-res[2]+1
+#         }
+#       }
+#       else{
+#         res[3]<-res[3]+1
+#       }
+#     }
+#   }
   all <- ncol(p)
   results <- list()
   results[["better rank"]]<- c(res[1],res[1]/all*100.0)

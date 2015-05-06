@@ -23,6 +23,7 @@
 #'formula for the candidates should be calculated using the SMILES 
 #'property rather than the MolecularFormula, e.g. if MolecularFormula
 #'is not provided.
+#'@param verbose logical indicating if a detailed output is wanted
 #'@import iterators
 #'@import rcdk
 #'@export
@@ -30,7 +31,8 @@ read.sdf <- function(path, id = "DatabaseID",add=0.01,
                      filter_by_formula=FALSE, formulas =NULL,
                      filter_by_peaks=FALSE,  npe = NULL, 
                      NumberPeaksExplained=NULL,
-                     formula_by_SMILES=FALSE){
+                     formula_by_SMILES=FALSE,
+                     verbose=FALSE){
   
   folder <- list.files(path, all.files=FALSE, full.names = TRUE)
   
@@ -41,13 +43,13 @@ read.sdf <- function(path, id = "DatabaseID",add=0.01,
   tmp_rownames <- vector("character")
   tmp_colnames <- vector("character")
   for(file in folder){
-    
+    if(verbose){print(file)}
     base <- tail(strsplit(x = file,split='/')[[1]],n=1)
         
     moliter <- iload.molecules(file, type="sdf")
     
     while(hasNext(moliter)) {
-      mol <- nextElem(moliter)
+      capture.output( mol <- nextElem(moliter), file=".NUL" )
       
       if(filter_by_peaks){
         
@@ -127,6 +129,8 @@ read.sdf <- function(path, id = "DatabaseID",add=0.01,
     p <- p[,-remove]
   }
   return(p)
+  
+  file.remove(".NUL")
 }
 
 #

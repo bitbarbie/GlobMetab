@@ -6,7 +6,7 @@
 \usage{
 read.sdf(path, id = "DatabaseID", add = 0.01, filter_by_formula = FALSE,
   formulas = NULL, filter_by_peaks = FALSE, npe = NULL,
-  NumberPeaksExplained = NULL, formula_by_SMILES = FALSE)
+  NumberPeaksExplained = NULL, formula_by_SMILES = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{path}{a character string specifying the absolute path of
@@ -41,6 +41,8 @@ explained by the MetFrag-candidates peakspectrum}
 formula for the candidates should be calculated using the SMILES
 property rather than the MolecularFormula, e.g. if MolecularFormula
 is not provided.}
+
+\item{verbose}{logical indicating if a detailed output is wanted}
 }
 \description{
 A function to read list of sdf file into a matrix p
