@@ -68,15 +68,28 @@ validate_vector<-function(true, pred){
 #' @description This function ranks a numeric (scoring) matrix colwise
 #' assigning the worst case rank.
 #' @param p a matrix containing colwise scoring lists to be ranked.
+#' @param comp_cores number of cores to use for parallel processing
 #' @details Decreasing order - high scores appear at low rank.
 #' If e.g. the first two candidates of a list have the same score 
 #' the rank is the worst possible, so in this case 2 for both. 
 #' @author Sarah Scharfenberg
 #' @return A matrix similar to input but storing the ranks. 
+#' @import parallel
+#' @import doParallel
 #' @export
-worst_case_ranking <- function(p){
-  
-  ranking <- sapply(1:ncol(p),function(m){    
+worst_case_ranking <- function(p, comp_cores=1){
+
+  if(comp_cores > detectCores()){comp_cores <- detectCores()}
+  cl <- makeCluster(comp_cores)
+  registerDoParallel(cl)
+#########################################################
+  ranking<- foreach::foreach( m=1:ncol(p), 
+                              .errorhandling = "stop",
+                              .init=NULL,
+                              .combine = "cbind") %dopar%{ 
+######################################################### 
+
+#  ranking <- sapply(1:ncol(p),function(m){    
     p_col <- p[,m]
     names(p_col)<-rownames(p)
     p_col <- sort(p_col, decreasing = TRUE)
@@ -96,7 +109,8 @@ worst_case_ranking <- function(p){
         }
     }
     return(r_col[order])
-  })
+  }
+  stopCluster(cl)
   rownames(ranking)<-rownames(p)
   colnames(ranking)<-colnames(p)
   return(ranking)
@@ -107,30 +121,38 @@ worst_case_ranking <- function(p){
 #' @description This function ranks a numeric (scoring) matrix colwise
 #' assigning the average case rank.
 #' @param p a matrix containing colwise scoring lists to be ranked.
+#' @param comp_cores number of cores to use for parallel processing
 #' @details Decreasing order - high scores appear at low rank. 
 #' If e.g. the first two candidates of a list have the same score 
 #' the rank is the mean of all involved scores, so in this case (1+2)/2 = 1.5.
 #' @author Sarah Scharfenberg
 #' @return A matrix similar to input but storing the ranks. 
+#' @import parallel
+#' @import doParallel
 #' @export
-average_case_ranking <- function(p){
+average_case_ranking <- function(p, comp_cores=1){
   
-  ranking <- matrix(0, ncol=ncol(p), nrow=nrow(p))
-  rownames(ranking)<-rownames(p)
-  colnames(ranking)<-colnames(p)
-  
-  for(m in 1:ncol(p)){
+  if(comp_cores > detectCores()){comp_cores <- detectCores()}
+  cl <- makeCluster(comp_cores)
+  registerDoParallel(cl)
+#########################################################
+  ranking<- foreach::foreach( m=1:ncol(p), 
+                              .errorhandling = "stop",
+                              .init=NULL,
+                              .combine = "cbind") %dopar%{ 
+######################################################### 
+#  for(m in 1:ncol(p)){
     
     p_col <- p[,m]
     names(p_col)<-rownames(p)
     p_col <- sort(p_col, decreasing = TRUE)
+    order <- sapply(1:length(rownames(p)), function(x){which(names(p_col)==rownames(p)[x])})
     r_col <- vector("numeric",length(p_col))
     set <- vector("logical",length(p_col))
     names(r_col)<-names(p_col)
     r <- 0
     #calculate ranking
     for(c in 1:nrow(p)){
-      if(p_col[c]>0){
         if(!set[c]){
           entry <- p_col[c]        
           no <- length(which(p_col==entry))
@@ -139,13 +161,12 @@ average_case_ranking <- function(p){
           set[which(p_col==entry)]=TRUE
           r <- r+no
         }
-      }
     }
-    #sort in table
-    for(c in 1:length(r_col)){
-      ranking[names(r_col)[c],m]<-r_col[c]
-    }
+    return(r_col[order])
   }
+  stopCluster(cl)
+  rownames(ranking)<-rownames(p)
+  colnames(ranking)<-colnames(p)
   return(ranking)
 }
 
@@ -153,30 +174,36 @@ average_case_ranking <- function(p){
 #' @description This function ranks a numeric (scoring) matrix colwise
 #' assigning the best case rank.
 #' @param p a matrix containing colwise scoring lists to be ranked.
+#' @param comp_cores number of cores to use for parallel processing
 #' @details Decreasing order - high scores appear at low rank. 
 #' If e.g. the first two candidates of a list have the same score 
 #' the rank is the best possible, so in this case 1 for both.
 #' @author Sarah Scharfenberg
 #' @return A matrix similar to input but storing the ranks. 
 #' @export
-best_case_ranking <- function(p){
+best_case_ranking <- function(p, comp_core){
   
-  ranking <- matrix(0, ncol=ncol(p), nrow=nrow(p))
-  rownames(ranking)<-rownames(p)
-  colnames(ranking)<-colnames(p)
-  
-  for(m in 1:ncol(p)){
+  if(comp_cores > detectCores()){comp_cores <- detectCores()}
+  cl <- makeCluster(comp_cores)
+  registerDoParallel(cl)
+#########################################################
+  ranking<- foreach::foreach( m=1:ncol(p), 
+                              .errorhandling = "stop",
+                              .init=NULL,
+                              .combine = "cbind") %dopar%{ 
+######################################################### 
+  #for(m in 1:ncol(p)){
     
     p_col <- p[,m]
     names(p_col)<-rownames(p)
     p_col <- sort(p_col, decreasing = TRUE)
+    order <- sapply(1:length(rownames(p)), function(x){which(names(p_col)==rownames(p)[x])})
     r_col <- vector("numeric",length(p_col))
     set <- vector("logical",length(p_col))
     names(r_col)<-names(p_col)
     r <- 1
     #calculate ranking
     for(c in 1:nrow(p)){
-      if(p_col[c]>0){
         if(!set[c]){
           entry <- p_col[c]
           r_col[which(p_col==entry)]=r
@@ -184,12 +211,8 @@ best_case_ranking <- function(p){
           no <- length(which(p_col==entry))
           r <- r+no
         }
-      }
     }
-    #sort in table
-    for(c in 1:length(r_col)){
-      ranking[names(r_col)[c],m]<-r_col[c]
-    }
+    return(r_col[order])
   }
   return(ranking)
 }
@@ -251,6 +274,7 @@ validate_rank<-function(z_true,p,p_new){
 #' and a column for each sample storing a complete assignemtn of all
 #' unknown variables
 #' @param samples the number of sampels to consider for calculation
+#' @param number of burn in samples to discard (only sensible if last=FALSE)
 #' @param mode one of "mul" or "add" or nothing if the resulting score should
 #' be multiplied with or added to p 
 #' @param last a logical value indicating whether the samples should be 
@@ -259,16 +283,25 @@ validate_rank<-function(z_true,p,p_new){
 #' @author Sarah Scharfenberg
 #' @return A matrix storing the new scores.
 #' @export
-calculate_score <- function(p,class_table,samples,mode=NULL,last=TRUE){
+calculate_score <- function(p,class_table,samples,
+                            burnin_samples=NULL,mode=NULL,
+                            last=FALSE){
+  
   if(ncol(p)!=nrow(class_table)){
     stop(print("wrong dimension"))
   }
   end <- ncol(class_table)
   start <- end-samples+1  
   if(!last){
-    end <- samples
-    start <- 1
+    if(is.null(burnin_samples)){
+      start <- 1
+      end <- samples
+    }else{
+      start <- 1+burnin_samples
+      end <- burnin_samples + samples
+    }
   }
+  
   result <- matrix(0, ncol=ncol(p), nrow=nrow(p))
   for(m in 1:ncol(p)){
     counts <- as.data.frame(table(class_table[m,start:end]))

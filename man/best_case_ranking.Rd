@@ -4,10 +4,12 @@
 \alias{best_case_ranking}
 \title{Best case ranking.}
 \usage{
-best_case_ranking(p)
+best_case_ranking(p, comp_core)
 }
 \arguments{
 \item{p}{a matrix containing colwise scoring lists to be ranked.}
+
+\item{comp_cores}{number of cores to use for parallel processing}
 }
 \value{
 A matrix similar to input but storing the ranks.

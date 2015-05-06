@@ -4,10 +4,12 @@
 \alias{average_case_ranking}
 \title{Average case ranking.}
 \usage{
-average_case_ranking(p)
+average_case_ranking(p, comp_cores = 1)
 }
 \arguments{
 \item{p}{a matrix containing colwise scoring lists to be ranked.}
+
+\item{comp_cores}{number of cores to use for parallel processing}
 }
 \value{
 A matrix similar to input but storing the ranks.

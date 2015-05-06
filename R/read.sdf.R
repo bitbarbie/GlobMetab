@@ -129,6 +129,135 @@ read.sdf <- function(path, id = "DatabaseID",add=0.01,
   return(p)
 }
 
+#
+# p is NOT sparse 
+#
+# read.sdf_sparse <- function(path, id = "DatabaseID",add=0.01, 
+#                      filter_by_formula=FALSE, formulas =NULL,
+#                      filter_by_peaks=FALSE,  npe = NULL, 
+#                      NumberPeaksExplained=NULL,
+#                      formula_by_SMILES=FALSE){
+#   
+#   folder <- list.files(path, all.files=FALSE, full.names = TRUE)
+#   
+#   # each query provides one sdf input file
+#   M <- length(folder)
+#   
+#   #  p <- matrix(0,ncol=M)
+#   pRows <- vector()
+#   pCols <- vector()
+#   pVals <- vector()
+# 
+#   current_col <- 1
+#   current_row <- 1
+#   set <- FALSE
+#   
+#   tmp_rownames <- vector("character")
+#   tmp_colnames <- vector("character")
+#   for(file in folder){
+#     
+#     base <- tail(strsplit(x = file,split='/')[[1]],n=1)
+#     
+#     moliter <- iload.molecules(file, type="sdf")
+#     
+#     while(hasNext(moliter)) {
+#       mol <- nextElem(moliter)
+#       seize <- FALSE
+#       if(filter_by_peaks){
+#         
+#         if(is.null(npe)||is.null(NumberPeaksExplained)){
+#           stop("npe and NumberPeaksExplained must be provided when filter_by_peaks is set.")
+#         }
+#         if(rcdk::get.property(mol,npe)>=NumberPeaksExplained){
+#           
+#           if(filter_by_formula ){
+#             if(is.element(base,names(formulas))){
+#               
+#               if(formula_by_SMILES){
+#                 smiles <- rcdk::get.property(mol,"SMILES")
+#                 molecule <- rcdk::parse.smiles(smiles)[[1]]
+#                 formula <- rcdk::get.mol2formula(molecule,charge=0)@string
+#               }else{
+#                 formula <- rcdk::get.property(mol,"MolecularFormula")
+#               }
+#               if( formula == formulas[base]){
+#                 seize <- TRUE
+#               }
+#               
+#             }else{
+#               print(paste0("No formula provided for ",base,". Return unfiltered list here."))
+#             }
+#           }else{
+#             seize <- TRUE
+#           }
+#         }
+#         
+#       }else{ #filter not by peaks
+#         
+#         if(filter_by_formula ){
+#           if(is.element(base,names(formulas))){
+#             
+#             if(formula_by_SMILES){
+#               smiles <- rcdk::get.property(mol,"SMILES")
+#               molecule <- rcdk::parse.smiles(smiles)[[1]]
+#               formula <- rcdk::get.mol2formula(molecule,charge=0)@string
+#             }else{
+#               formula <- rcdk::get.property(mol,"MolecularFormula")
+#             }
+#             if( formula == formulas[base]){
+#               seize <- TRUE
+#             }
+#             
+#           }else{
+#             print(paste0("No formula provided for ",base,". Return unfiltered list here."))
+#           }
+#         }else{
+#           seize <- TRUE
+#         }
+#         
+#       }
+#       
+#       if(seize){
+#         # p <- rbind(p,c(rep(0,times=current),(as.numeric(rcdk::get.property(mol,"Score"))+add),rep(0, times=M-current-1)))
+#         rname <- rcdk::get.property(mol,id)
+#         if(is.element(rname,tmp_rownames)){
+#           pRows <- c(pRows,which(tmp_rownames==rname))
+#         }else{
+#           pRows <- c(pRows,current_row)
+#           current_row <- current_row +1
+#         }    
+#         pCols <- c(pCols,current_col)
+#         pVals <- c(pVals,as.numeric(rcdk::get.property(mol,"Score"))+add)
+#         tmp_rownames <- c(tmp_rownames, rname)
+#         set <- TRUE
+#       }
+#     }
+#     if(set){
+#       current_col <- current_col+1
+#       # get colname from file name
+#       splits <- strsplit(file,"/|\\.")[[1]]
+#       tmp_colnames <- c(tmp_colnames,splits[length(splits)-1])
+#       set <- FALSE
+#     }
+#   }  
+#   #p <- p[-1,]
+#   p <- sparseMatrix(i = pRows, j = pCols, x = pVals,
+#                     symmetric = FALSE, index1 = TRUE)
+#   rownames(p) <- tmp_rownames
+#   colnames(p) <- tmp_colnames
+# #  remove <- vector("numeric")
+# #   for(i in 1:ncol(p)){
+# #     if(sum(p[,i])==0){
+# #       remove <- c(remove,i)
+# #       print(paste0("remove ",colnames(p)[i]))
+# #     }
+# #   }
+# #   if(length(remove)>0){
+# #     p <- p[,-remove]
+# #   }
+#   return(p)
+# }
+
 #'@title Eliminate redundancies.
 #'@description This function matchs redundand rows into one row.
 #'@param p a matrix

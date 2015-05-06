@@ -59,6 +59,8 @@ get_relationmatrix_rp<-function(p, rp){
   wVals <- rep(1, times=length(wRows))
   w <- sparseMatrix(i = wRows, j = wCols, x = wVals, dims = c(C,C),
                     symmetric = TRUE, index1 = TRUE)
+  rownames(w)<-all_in_p
+  colnames(w)<-all_in_p
   return(w)
 }
 
@@ -186,6 +188,8 @@ get_relationmatrix_distance <- function(p, dist="tanimoto",
   }
   w <- sparseMatrix(i = wRows, j = wCols, x = wVals, dims = c(C,C),
                     symmetric = TRUE, index1 = TRUE)
+  rownames(w)<-all_in_p
+  colnames(w)<-all_in_p
   return(w)
 }
 
