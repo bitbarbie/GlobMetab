@@ -129,7 +129,7 @@ read.sdf <- function(path, id = "DatabaseID",add=0.01,
   }
   return(p)
   
-  file.remove(".tmp_output")
+  unlink(".tmp_output")
 }
 
 
@@ -201,8 +201,10 @@ read.sdf_sparse <- function(path, id = "DatabaseID",add=0.01,
     set <- FALSE
 
     file <- folder[f]  
-    write(paste0("processing ",file),file = paste0(".progress/",f,".log"))
-
+    if(verbose){
+      write(x = paste0("processing ",file," at ",Sys.time()),
+          file = paste0(".tmp_progress/",f,".log"))
+    }
     base <- tail(strsplit(x = file,split='/')[[1]],n=1)
     
     moliter <- iload.molecules(file, type="sdf")
@@ -314,7 +316,8 @@ read.sdf_sparse <- function(path, id = "DatabaseID",add=0.01,
   rownames(p) <- uniqNames
   colnames(p) <-  as.character(unique(par_res[,"pcName"]))
 
-  file.remove(".tmp_output")
+  unlink(".tmp_output")
+  unlink(".tmp_progress",recursive = TRUE)
   return(p)
 }
 

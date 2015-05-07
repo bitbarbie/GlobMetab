@@ -268,10 +268,11 @@ get_relationmatrix_distance_par <- function(p, dist="tanimoto",
   cl <- makeCluster(comp_cores)
   registerDoParallel(cl)
   print("Cores registered")
+  if(verbose){ dir.create(".tmp_progress")}
   
   #########################################################
   par_res<- foreach::foreach( c1=1:(C-1), .errorhandling = "stop",
-                    .verbose = verbose,
+                   # .verbose = verbose,
                     .init=NULL,
                     .combine = "rbind",
                     .packages = "rcdk") %dopar%{ 
@@ -283,7 +284,11 @@ get_relationmatrix_distance_par <- function(p, dist="tanimoto",
     wVals <- vector(mode = "numeric", length = 0)
 
     fp1 <- fingerprints[[all_in_p[c1]]]
-    print(paste0(c1,"/",C))
+    if(verbose){
+      write(x = paste0(c1,"/",C," at ",Sys.time()),
+            file = paste0(".tmp_progress/",f,".log"))
+    }
+
     
     for(c2 in (c1+1):C){
       fp2 <- fingerprints[[all_in_p[c2]]]
@@ -326,5 +331,6 @@ get_relationmatrix_distance_par <- function(p, dist="tanimoto",
   wVals <- par_res[,3]
   w <- sparseMatrix(i = wRows, j = wCols, x = wVals, dims = c(C,C),
                     symmetric = TRUE, index1 = TRUE)
-  return(w)
+  unlink(".tmp_progress",recursive = TRUE)
+return(w)
 }
