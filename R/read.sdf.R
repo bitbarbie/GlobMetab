@@ -171,7 +171,8 @@ read.sdf_sparse <- function(path, id = "DatabaseID",add=0.01,
                      filter_by_formula=FALSE, formulas =NULL,
                      filter_by_peaks=FALSE,  npe = NULL, 
                      NumberPeaksExplained=NULL,
-                     formula_by_SMILES=FALSE, comp_cores=1){
+                     formula_by_SMILES=FALSE, verbose=FALSE,
+                     comp_cores=1){
   
   if(comp_cores > parallel::detectCores())
     stop("You assigned more cores to the comp_cores argument than are availible on your machine.")
@@ -184,11 +185,12 @@ read.sdf_sparse <- function(path, id = "DatabaseID",add=0.01,
   cl <- makeCluster(comp_cores)
   registerDoParallel(cl)
   print("Cores registered")
+  if(verbose){ dir.create(".tmp_progress")}
   
   #########################################################
   par_res<- foreach::foreach( f=1:length(folder),   
                               .errorhandling = "stop",
-                             # .verbose = verbose,
+                            #  .verbose = verbose,
                               .init=NULL,
                               .packages = c("rcdk","iterators"),
                               .combine = "rbind") %dopar%{ 
@@ -199,7 +201,8 @@ read.sdf_sparse <- function(path, id = "DatabaseID",add=0.01,
     set <- FALSE
 
     file <- folder[f]  
-  
+    write(paste0("processing ",file),file = paste0(".progress/",f,".log"))
+
     base <- tail(strsplit(x = file,split='/')[[1]],n=1)
     
     moliter <- iload.molecules(file, type="sdf")
