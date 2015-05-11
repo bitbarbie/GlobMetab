@@ -77,11 +77,14 @@ validate_vector<-function(true, pred){
 #' @import parallel
 #' @import doParallel
 #' @export
-worst_case_ranking <- function(p, comp_cores=1){
-
-  if(comp_cores > detectCores()){comp_cores <- detectCores()}
-  cl <- makeCluster(comp_cores)
-  registerDoParallel(cl)
+worst_case_ranking <- function(p, comp_cores=NULL){
+  turnon<-FALSE
+  if(!is.null(comp_cores)){
+    if(comp_cores > detectCores()){comp_cores <- detectCores()}
+    cl <- makeCluster(comp_cores)
+    registerDoParallel(cl)
+    turnon <- TRUE
+  }
 #########################################################
   ranking<- foreach::foreach( m=1:ncol(p), 
                               .errorhandling = "stop",
@@ -110,7 +113,7 @@ worst_case_ranking <- function(p, comp_cores=1){
     }
     return(r_col[order])
   }
-  stopCluster(cl)
+  if(turnon){stopCluster(cl)}
   rownames(ranking)<-rownames(p)
   colnames(ranking)<-colnames(p)
   return(ranking)
@@ -280,12 +283,9 @@ validate_rank<-function(z_true,p,p_new){
 #' and a column for each sample storing a complete assignemtn of all
 #' unknown variables
 #' @param samples the number of sampels to consider for calculation
-#' @param number of burn in samples to discard (only sensible if last=FALSE)
+#' @param number of burn in samples to discard 
 #' @param mode one of "mul" or "add" or nothing if the resulting score should
 #' be multiplied with or added to p 
-#' @param last a logical value indicating whether the samples should be 
-#' obtained from the end (e.g. the last 1000 samples, equivalent to a
-#' burn in phase of nrow(class_table)-samples)
 #' @param comp_cores number of cores to use for parallel processing
 #' @author Sarah Scharfenberg
 #' @return A matrix storing the new scores.
@@ -294,28 +294,27 @@ validate_rank<-function(z_true,p,p_new){
 #' @export
 calculate_score <- function(p,class_table,samples,
                             burnin_samples=NULL,mode=NULL,
-                            last=FALSE, comp_cores){
+                            comp_cores=NULL){
   
   if(ncol(p)!=nrow(class_table)){
     stop(print("wrong dimension"))
   }
-  end <- ncol(class_table)
-  start <- end-samples+1  
-  if(!last){
-    if(is.null(burnin_samples)){
+  if(is.null(burnin_samples)){
       start <- 1
       end <- samples
-    }else{
+  }else{
       start <- 1+burnin_samples
       end <- burnin_samples + samples
-    }
   }
   
  # result <- matrix(0, ncol=ncol(p), nrow=nrow(p))
-  
-  if(comp_cores > detectCores()){comp_cores <- detectCores()}
-  cl <- makeCluster(comp_cores)
-  registerDoParallel(cl)
+  turnon<-FALSE
+  if(!is.null(comp_cores)){
+    if(comp_cores > detectCores()){comp_cores <- detectCores()}
+    cl <- makeCluster(comp_cores)
+    registerDoParallel(cl)
+    turnon <- TRUE
+  }
 #########################################################
   result<- foreach::foreach( m=1:ncol(p), 
                               .errorhandling = "stop",
@@ -341,7 +340,7 @@ calculate_score <- function(p,class_table,samples,
     # in range of class_table[m,start:end]
     return(res)
   }
-  stopCluster(cl)
+  if(turnon){  stopCluster(cl) }
   rownames(result)<-rownames(p)
   colnames(result)<-colnames(p)
   result <- result/ncol(class_table)

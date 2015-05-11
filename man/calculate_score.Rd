@@ -5,7 +5,7 @@
 \title{Calculate Scores from sample table.}
 \usage{
 calculate_score(p, class_table, samples, burnin_samples = NULL, mode = NULL,
-  last = FALSE, comp_cores)
+  comp_cores = NULL)
 }
 \arguments{
 \item{p}{named Likelihood matrix}
@@ -19,13 +19,9 @@ unknown variables}
 \item{mode}{one of "mul" or "add" or nothing if the resulting score should
 be multiplied with or added to p}
 
-\item{last}{a logical value indicating whether the samples should be
-obtained from the end (e.g. the last 1000 samples, equivalent to a
-burn in phase of nrow(class_table)-samples)}
-
 \item{comp_cores}{number of cores to use for parallel processing}
 
-\item{number}{of burn in samples to discard (only sensible if last=FALSE)}
+\item{number}{of burn in samples to discard}
 }
 \value{
 A matrix storing the new scores.

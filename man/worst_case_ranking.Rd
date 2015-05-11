@@ -4,7 +4,7 @@
 \alias{worst_case_ranking}
 \title{Worst case ranking.}
 \usage{
-worst_case_ranking(p, comp_cores = 1)
+worst_case_ranking(p, comp_cores = NULL)
 }
 \arguments{
 \item{p}{a matrix containing colwise scoring lists to be ranked.}
