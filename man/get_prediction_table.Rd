@@ -4,7 +4,8 @@
 \alias{get_prediction_table}
 \title{Get prediction table.}
 \usage{
-get_prediction_table(p, ranking = "worst case", max_rank = 10)
+get_prediction_table(p, ranking = "worst case", max_rank = NULL,
+  comp_cores = NULL)
 }
 \arguments{
 \item{p}{named Likelihood matrix}

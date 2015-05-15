@@ -401,29 +401,29 @@ get_relationmatrix_distance_mem <- function(row_ids,col_ids,
     registerDoParallel(cl)
     print("Cores registered")
   }  
-
-  fingerprints <- list()
-    for(id in sort(as.integer(c(row_ids, col_ids)))){
-    
-      if(verbose){ print(paste0("next id: ",id))}
-      if(id%%100==0){
-        end <- id 
-      }else{
-        end <- (id%/%100)*100+100
+  if(is.null(fingerprints)){
+    fingerprints <- list()
+      for(id in sort(as.integer(c(row_ids, col_ids)))){
+      
+        if(verbose){ print(paste0("next id: ",id))}
+        if(id%%100==0){
+          end <- id 
+        }else{
+          end <- (id%/%100)*100+100
+        }
+        start <- end-100+1
+        file <- paste0("part_",start,"_",end,".csv")
+        if(verbose){ print(paste0("reading ",file))}
+        tmp <- data.table::fread(paste0(folder_PubChemID,file))
+        if(verbose){ print("succeded")}
+        s <- tmp[which(tmp[,cid]==id),openeye_can_smiles]
+        if(length(s)!=0){
+          m <- rcdk::parse.smiles(s)
+          fp <- rcdk::get.fingerprint(m[[1]])
+          fingerprints[[as.character(id)]]<-fp   
+        }
       }
-      start <- end-100+1
-      file <- paste0("part_",start,"_",end,".csv")
-      if(verbose){ print(paste0("reading ",file))}
-      tmp <- data.table::fread(paste0(folder_PubChemID,file))
-      if(verbose){ print("succeded")}
-      s <- tmp[which(tmp[,cid]==id),openeye_can_smiles]
-      if(length(s)!=0){
-        m <- parse.smiles(s)
-        fp <- get.fingerprint(m[[1]])
-        fingerprints[[as.character(id)]]<-fp   
-      }
-    }
-
+    } # end if no fingerprints provided
     if(verbose){ dir.create(".tmp_progress")}
   
     C_rows <- length(row_ids)

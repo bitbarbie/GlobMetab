@@ -360,13 +360,14 @@ calculate_score <- function(p,class_table,samples,
 #' @return A data.frame storing 'query', 'rank', 'score', 'candidate', 'cname'
 #' foreach compound with rank <=max_rank.
 #' @export
-get_prediction_table <- function(p, ranking="worst case", max_rank=10){
+get_prediction_table <- function(p, ranking="worst case", max_rank=NULL,comp_cores=NULL){
   rank_table <- NULL
-  if(ranking=="worst case"){rank_table <- worst_case_ranking(p)}
+  if(ranking=="worst case"){rank_table <- worst_case_ranking(p, comp_cores)}
   pred <- data.frame()
   for(x in 1:ncol(p)){
     tmp <- rownames(rank_table)
     tmp_table <-data.frame()
+    if(is.null(max_rank)){max_rank <- max(rank_table[,x])}
     for(y in 1:max_rank){
       ids <- which(rank_table[,x]==y)
       if(length(ids>0)){
