@@ -293,7 +293,7 @@ validate_rank<-function(z_true,p,p_new){
 #' @import parallel
 #' @export
 calculate_score <- function(p,class_table,samples,
-                            burnin_samples=NULL,mode=NULL,
+                            burnin_samples=NULL,mode="",
                             comp_cores=NULL){
   
   if(ncol(p)!=nrow(class_table)){

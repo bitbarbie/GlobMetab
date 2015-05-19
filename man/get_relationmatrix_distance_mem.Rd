@@ -6,7 +6,7 @@
 \usage{
 get_relationmatrix_distance_mem(row_ids, col_ids, dist = "tanimoto",
   mode = "relation", threshold = 0.7, folder_PubChemID, verbose = FALSE,
-  comp_cores = NULL, all = FALSE)
+  comp_cores = NULL, all = FALSE, fingerprints = NULL)
 }
 \arguments{
 \item{row_ids}{a vector containing the rownames of w to be calculated by CID.}

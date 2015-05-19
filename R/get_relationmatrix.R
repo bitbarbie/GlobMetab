@@ -381,7 +381,8 @@ get_relationmatrix_distance_mem <- function(row_ids,col_ids,
                                             threshold=0.7,
                                             folder_PubChemID,verbose=FALSE,
                                             comp_cores=NULL,
-                                            all=FALSE){
+                                            all=FALSE,
+                                            fingerprints=NULL){
   
   if(!is.null(comp_cores)){
     if(comp_cores > parallel::detectCores())

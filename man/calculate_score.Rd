@@ -4,7 +4,7 @@
 \alias{calculate_score}
 \title{Calculate Scores from sample table.}
 \usage{
-calculate_score(p, class_table, samples, burnin_samples = NULL, mode = NULL,
+calculate_score(p, class_table, samples, burnin_samples = NULL, mode = "",
   comp_cores = NULL)
 }
 \arguments{
